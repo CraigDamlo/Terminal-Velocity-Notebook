@@ -57,24 +57,53 @@ def _(mo):
 @app.cell
 def _():
     # Define parameters
-    gravity = 9.81  # m/s^2 (acceleration due to gravity)
-    density_air = 1.225  # kg/m^3 (density of air)
+    gravity_e = 9.81  # m/s^2 (acceleration due to gravity) on Earth
+    gravity_m = 3.73 # m/s^2 (acceleration due to gravity) on Mars
+    density_air_e = 1.225  # kg/m^3 (density of air) on Earth
+    density_air_m = 0.020 # kg/m^3 (density of air) on Mars
     drag_coefficient = 0.47  # (dimensionless, typical value for spheres)
-    return density_air, drag_coefficient, gravity
+    return density_air_e, density_air_m, drag_coefficient, gravity_e, gravity_m
 
 
 @app.cell
-def _(area, density_air, drag_coefficient, gravity, mass, math):
-    # Calculate terminal velocity
-    terminal_velocity = math.sqrt((2 * mass.value * gravity) / (density_air * drag_coefficient * area.value))
-    return (terminal_velocity,)
+def _(area, density_air_e, drag_coefficient, gravity_e, mass, math):
+    # Calculate terminal velocity on Earth
+    terminal_velocity_e = math.sqrt((2 * mass.value * gravity_e) / (density_air_e * drag_coefficient * area.value))
+    return (terminal_velocity_e,)
 
 
 @app.cell
-def _(mo, terminal_velocity):
-    # Print the result
+def _(area, density_air_m, drag_coefficient, gravity_m, mass, math):
+    # Calculate terminal velocity on Mars
+    terminal_velocity_m = math.sqrt((2 * mass.value * gravity_m) / (density_air_m * drag_coefficient * area.value))
+    return (terminal_velocity_m,)
+
+
+@app.cell
+def _(mo):
+    mo.md(r"""### Earth""")
+    return
+
+
+@app.cell
+def _(mo, terminal_velocity_e):
+    # Print the result for Earth
     with mo.redirect_stdout():
-        print(f"The terminal velocity is: {terminal_velocity:.2f} m/s")
+        print(f"The terminal velocity is: {terminal_velocity_e:.2f} m/s")
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(r"""### Mars""")
+    return
+
+
+@app.cell
+def _(mo, terminal_velocity_m):
+    # Print the result for Mars
+    with mo.redirect_stdout():
+        print(f"The terminal velocity is: {terminal_velocity_m:.2f} m/s")
     return
 
 
