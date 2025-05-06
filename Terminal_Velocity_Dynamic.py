@@ -37,7 +37,7 @@ def _(mo):
 
 @app.cell
 def _(mo):
-    area = mo.ui.slider(.01,10, value=0.25, step=0.25, label="Area", show_value=True) # m^2 (cross-sectional area of the object)
+    area = mo.ui.slider(.25,10, value=1, step=0.25, label="Area", show_value=True) # m^2 (cross-sectional area of the object)
     area
     return (area,)
 
