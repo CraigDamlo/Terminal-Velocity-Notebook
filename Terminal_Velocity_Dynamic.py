@@ -20,9 +20,21 @@ def _(mo):
 
     * The constant acceleration due to gravity
     * The density of air
-    * The drag coefficient, estimated as 0.5 for a sphere
+    * The drag coefficient, estimated as 0.47 for a sphere
     * The area of the sphere
     * The mass of the sphere
+    """
+    )
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(
+        r"""
+    ## Calculate Terminal Velocity
+    * Slide the mass slider up and down to change the mass (in kgs) of the sphere being dropped to see the effect on the terminal velocity
+    * Slide the area slider to adjust the cross area(in m<sup>2</sup>)of the sphere being dropped to see the effect on the terminal velocity
     """
     )
     return
@@ -47,7 +59,7 @@ def _():
     # Define parameters
     gravity = 9.81  # m/s^2 (acceleration due to gravity)
     density_air = 1.225  # kg/m^3 (density of air)
-    drag_coefficient = 0.5  # (dimensionless, typical value for spheres)
+    drag_coefficient = 0.47  # (dimensionless, typical value for spheres)
     return density_air, drag_coefficient, gravity
 
 
