@@ -59,9 +59,10 @@ def _(area, density_air, drag_coefficient, gravity, mass, math):
 
 
 @app.cell
-def _(terminal_velocity):
+def _(mo, terminal_velocity):
     # Print the result
-    print(f"The terminal velocity is: {terminal_velocity:.2f} m/s")
+    with mo.redirect_stdout():
+        print(f"The terminal velocity is: {terminal_velocity:.2f} m/s")
     return
 
 
