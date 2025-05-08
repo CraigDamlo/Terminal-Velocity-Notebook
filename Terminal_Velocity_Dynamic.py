@@ -136,7 +136,7 @@ def _(mo):
 
 @app.cell
 def _(mo):
-    height = mo.ui.slider(1,100000, value=10, step=1, label="Drop Height", show_value=True) # m (height the object will be dropped from)
+    height = mo.ui.slider(1,100000, value=10, step=1, label="Drop Height", show_value=True, orientation='vertical') # m (height the object will be dropped from)
     height
     return (height,)
 
@@ -145,7 +145,7 @@ def _(mo):
 def _():
     # Simulation parameters
     dt = 0.1  # Time step in seconds
-    max_time = 200  # Maximum simulation time in seconds
+    max_time = 2000  # Maximum simulation time in seconds
     return dt, max_time
 
 
@@ -169,53 +169,124 @@ def _(
     terminal_velocity_e,
 ):
     # Initialize arrays
-    time_points = np.arange(0, max_time, dt)
-    velocities = np.zeros_like(time_points)
-    heights = np.zeros_like(time_points)
+    time_points_e = np.arange(0, max_time, dt)
+    velocities_e = np.zeros_like(time_points_e)
+    heights_e = np.zeros_like(time_points_e)
 
     # Set initial conditions
-    heights[0] = height.value
-    velocities[0] = 0
+    heights_e[0] = height.value
+    velocities_e[0] = 0
 
     # Simulation loop
-    for i in range(1, len(time_points)):
+    for i in range(1, len(time_points_e)):
         # Calculate drag force
-        drag_force = .5 * density_air_e * velocities[i-1]**2 * drag_coefficient * area.value
+        drag_force_e = .5 * density_air_e * velocities_e[i-1]**2 * drag_coefficient * area.value
 
         # Net force (gravity minus drag)
-        net_force = mass.value * gravity_e - drag_force
+        net_force_e = mass.value * gravity_e - drag_force_e
 
         # Acceleration
-        acceleration = net_force / mass.value
+        acceleration_e = net_force_e / mass.value
 
         # Update velocity
-        velocities[i] = velocities[i-1] + acceleration * dt
+        velocities_e[i] = velocities_e[i-1] + acceleration_e * dt
 
         # Ensure velocity doesn't exceed terminal velocity
         # This is a physical constraint due to air resistance
-        if velocities[i] > terminal_velocity_e:
-            velocities[i] = terminal_velocity_e
+        if velocities_e[i] > terminal_velocity_e:
+            velocities_e[i] = terminal_velocity_e
 
         # Update position
-        heights[i] = heights[i-1] - velocities[i-1] * dt
+        heights_e[i] = heights_e[i-1] - velocities_e[i-1] * dt
 
         # Check if shpere has hit the ground
-        if heights[i] <= 0:
+        if heights_e[i] <= 0:
             # Truncate arrays at this point
-            time_points = time_points[:i+1]
-            velocities = velocities[:i+1]
-            heights = heights[:i+1]
-            print(f"Ball hits the ground after {time_points[-1]:.2f} seconds")
+            time_points_e = time_points_e[:i+1]
+            velocities_e = velocities_e[:i+1]
+            heights_e = heights_e[:i+1]
+            print(f"The shpere did not reach terminal velocity and hit the ground after {time_points_e[-1]:.2f} seconds")
             break
 
     # Create the velocity plot
     fig = plt.figure(figsize=(10, 6))
-    plt.plot(time_points, velocities, 'b-', linewidth=2, label='Velocity')
+    plt.plot(time_points_e, velocities_e, 'b-', linewidth=2, label='Velocity')
     plt.axhline(y=terminal_velocity_e, color='r', linestyle='--', 
                 label=f'Terminal Velocity: {terminal_velocity_e:.2f} m/s')
     plt.xlabel('Time (seconds)')
     plt.ylabel('Velocity (m/s)')
-    plt.title('Velocity of Ball Dropped from 100 km')
+    plt.title(f"Velocity of Ball Dropped from {height.value} km on Earth")
+    plt.grid(True)
+    plt.legend()
+    plt.tight_layout()
+
+    plt.gca()
+
+    return
+
+
+@app.cell
+def _(
+    area,
+    density_air_m,
+    drag_coefficient,
+    dt,
+    gravity_m,
+    height,
+    mass,
+    max_time,
+    np,
+    plt,
+    terminal_velocity_m,
+):
+    # Initialize arrays
+    time_points_m = np.arange(0, max_time, dt)
+    velocities_m = np.zeros_like(time_points_m)
+    heights_m = np.zeros_like(time_points_m)
+
+    # Set initial conditions
+    heights_m[0] = height.value
+    velocities_m[0] = 0
+
+    # Simulation loop
+    for i2 in range(1, len(time_points_m)):
+        # Calculate drag force
+        drag_force_m = .5 * density_air_m * velocities_m[i2-1]**2 * drag_coefficient * area.value
+
+        # Net force (gravity minus drag)
+        net_force_m = mass.value * gravity_m - drag_force_m
+
+        # Acceleration
+        acceleration_m = net_force_m / mass.value
+
+        # Update velocity
+        velocities_m[i2] = velocities_m[i2-1] + acceleration_m * dt
+
+        # Ensure velocity doesn't exceed terminal velocity
+        # This is a physical constraint due to air resistance
+        if velocities_m[i2] > terminal_velocity_m:
+            velocities_m[i2] = terminal_velocity_m
+
+        # Update position
+        heights_m[i2] = heights_m[i2-1] - velocities_m[i2-1] * dt
+
+        # Check if shpere has hit the ground
+        if heights_m[i2] <= 0:
+            # Truncate arrays at this point
+            time_points_m = time_points_m[:i2+1]
+            velocities_m = velocities_m[:i2+1]
+            heights_m = heights_m[:i2+1]
+            print(f"The shpere did not reach terminal velocity and hit the ground after {time_points_m[-1]:.2f} seconds")
+            break
+
+    # Create the velocity plot
+    fig_m = plt.figure(figsize=(10, 6))
+    plt.plot(time_points_m, velocities_m, 'b-', linewidth=2, label='Velocity')
+    plt.axhline(y=terminal_velocity_m, color='r', linestyle='--', 
+                label=f'Terminal Velocity: {terminal_velocity_m:.2f} m/s')
+    plt.xlabel('Time (seconds)')
+    plt.ylabel('Velocity (m/s)')
+    plt.title(f"Velocity of Ball Dropped from {height.value} km on Mars")
     plt.grid(True)
     plt.legend()
     plt.tight_layout()
