@@ -136,7 +136,7 @@ def _(mo):
 
 @app.cell
 def _(mo):
-    height = mo.ui.slider(1,100, value=10, step=1, label="Drop Height", show_value=True) # km (height the object will be dropped from)
+    height = mo.ui.slider(1,100000, value=10, step=1, label="Drop Height", show_value=True) # m (height the object will be dropped from)
     height
     return (height,)
 
