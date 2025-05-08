@@ -1,7 +1,7 @@
 import marimo
 
 __generated_with = "0.13.4"
-app = marimo.App(width="medium")
+app = marimo.App(width="medium", app_title="Terminal Velocity")
 
 
 @app.cell
