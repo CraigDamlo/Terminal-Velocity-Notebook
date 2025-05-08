@@ -150,80 +150,78 @@ def _():
 
 
 @app.cell
-def _(dt, height, max_time, np):
-    # Initialize arrays
-    time_points = np.arange(0, max_time, dt)
-    velocities = np.zeros_like(time_points)
-    heights = np.zeros_like(time_points)
-    
-    # Set initial conditions
-    heights[0] = height.value
-    velocities[0] = 0
-    return heights, time_points, velocities
+def _():
+    return
 
 
 @app.cell
 def _(
-    air_density_e,
     area,
+    density_air_e,
     drag_coefficient,
     dt,
     gravity_e,
-    heights,
+    height,
     mass,
+    max_time,
+    np,
     plt,
-    terminal_velocity,
     terminal_velocity_e,
-    time_points,
-    velocities,
 ):
-    def __():
+    # Initialize arrays
+    time_points = np.arange(0, max_time, dt)
+    velocities = np.zeros_like(time_points)
+    heights = np.zeros_like(time_points)
 
-        # Simulation loop
-        for i in range(1, len(time_points)):
-            # Calculate drag force
-            drag_force = .5 * air_density_e * velocities[i-1]**2 * drag_coefficient * area
-        
-            # Net force (gravity minus drag)
-            net_force = mass * gravity_e - drag_force
-        
-            # Acceleration
-            acceleration = net_force / mass
-        
-            # Update velocity
-            velocities[i] = velocities[i-1] + acceleration * dt
-        
-            # Ensure velocity doesn't exceed terminal velocity
-            # This is a physical constraint due to air resistance
-            if velocities[i] > terminal_velocity_e:
-                velocities[i] = terminal_velocity_e
-        
-            # Update position
-            heights[i] = heights[i-1] - velocities[i-1] * dt
-        
-            # Check if shpere has hit the ground
-            if heights[i] <= 0:
-                # Truncate arrays at this point
-                time_points = time_points[:i+1]
-                velocities = velocities[:i+1]
-                heights = heights[:i+1]
-                print(f"Ball hits the ground after {time_points[-1]:.2f} seconds")
-                break
-    
-        # Create the velocity plot
-        fig = plt.figure(figsize=(10, 6))
-        plt.plot(time_points, velocities, 'b-', linewidth=2, label='Velocity')
-        plt.axhline(y=terminal_velocity, color='r', linestyle='--', 
-                   label=f'Terminal Velocity: {terminal_velocity:.2f} m/s')
-        plt.xlabel('Time (seconds)')
-        plt.ylabel('Velocity (m/s)')
-        plt.title('Velocity of Ball Dropped from 100 km')
-        plt.grid(True)
-        plt.legend()
-        plt.tight_layout()
-    
-        # Return the figure - Marimo handles this appropriately
-        return fig
+    # Set initial conditions
+    heights[0] = height.value
+    velocities[0] = 0
+
+    # Simulation loop
+    for i in range(1, len(time_points)):
+        # Calculate drag force
+        drag_force = .5 * density_air_e * velocities[i-1]**2 * drag_coefficient * area.value
+
+        # Net force (gravity minus drag)
+        net_force = mass.value * gravity_e - drag_force
+
+        # Acceleration
+        acceleration = net_force / mass.value
+
+        # Update velocity
+        velocities[i] = velocities[i-1] + acceleration * dt
+
+        # Ensure velocity doesn't exceed terminal velocity
+        # This is a physical constraint due to air resistance
+        if velocities[i] > terminal_velocity_e:
+            velocities[i] = terminal_velocity_e
+
+        # Update position
+        heights[i] = heights[i-1] - velocities[i-1] * dt
+
+        # Check if shpere has hit the ground
+        if heights[i] <= 0:
+            # Truncate arrays at this point
+            time_points = time_points[:i+1]
+            velocities = velocities[:i+1]
+            heights = heights[:i+1]
+            print(f"Ball hits the ground after {time_points[-1]:.2f} seconds")
+            break
+
+    # Create the velocity plot
+    fig = plt.figure(figsize=(10, 6))
+    plt.plot(time_points, velocities, 'b-', linewidth=2, label='Velocity')
+    plt.axhline(y=terminal_velocity_e, color='r', linestyle='--', 
+                label=f'Terminal Velocity: {terminal_velocity_e:.2f} m/s')
+    plt.xlabel('Time (seconds)')
+    plt.ylabel('Velocity (m/s)')
+    plt.title('Velocity of Ball Dropped from 100 km')
+    plt.grid(True)
+    plt.legend()
+    plt.tight_layout()
+
+    plt.gca()
+
     return
 
 
