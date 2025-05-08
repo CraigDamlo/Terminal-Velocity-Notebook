@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.13.4"
+__generated_with = "0.13.6"
 app = marimo.App(width="medium", app_title="Terminal Velocity")
 
 
@@ -8,7 +8,9 @@ app = marimo.App(width="medium", app_title="Terminal Velocity")
 def _():
     import marimo as mo
     import math
-    return math, mo
+    import matplotlib.pyplot as plt
+    import numpy as np
+    return math, mo, np, plt
 
 
 @app.cell
@@ -25,6 +27,12 @@ def _(mo):
     * The mass of the sphere
     """
     )
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(r"""---""")
     return
 
 
@@ -104,6 +112,118 @@ def _(mo, terminal_velocity_m):
     # Print the result for Mars
     with mo.redirect_stdout():
         print(f"The terminal velocity is: {terminal_velocity_m:.2f} m/s")
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(r"""---""")
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(
+        r"""
+    ## Visualization
+    So a shpere dropped from a specific hight doens't just jump to the terminal velocity, it takes time based on how strong gravity is. For examble on Earth in will fall 9.81 m/s^2, meaning each second it falls it gains 9.81 m/s untill it reaches terminal velocity; while on Mars it falls at 3.73 m/s^2.
+
+    So if you don't drop it from a great enough height it will not reach terminal velocity before it hits the ground (height = 0). This charg will show you the speed of the sphere dropped from a height defined by the slider below (in kms) until it reaches the ground.
+    """
+    )
+    return
+
+
+@app.cell
+def _(mo):
+    height = mo.ui.slider(1,100, value=10, step=1, label="Drop Height", show_value=True) # km (height the object will be dropped from)
+    height
+    return (height,)
+
+
+@app.cell
+def _():
+    # Simulation parameters
+    dt = 0.1  # Time step in seconds
+    max_time = 200  # Maximum simulation time in seconds
+    return dt, max_time
+
+
+@app.cell
+def _(dt, height, max_time, np):
+    # Initialize arrays
+    time_points = np.arange(0, max_time, dt)
+    velocities = np.zeros_like(time_points)
+    heights = np.zeros_like(time_points)
+    
+    # Set initial conditions
+    heights[0] = height.value
+    velocities[0] = 0
+    return heights, time_points, velocities
+
+
+@app.cell
+def _(
+    air_density_e,
+    area,
+    drag_coefficient,
+    dt,
+    gravity_e,
+    heights,
+    mass,
+    plt,
+    terminal_velocity,
+    terminal_velocity_e,
+    time_points,
+    velocities,
+):
+    def __():
+
+        # Simulation loop
+        for i in range(1, len(time_points)):
+            # Calculate drag force
+            drag_force = .5 * air_density_e * velocities[i-1]**2 * drag_coefficient * area
+        
+            # Net force (gravity minus drag)
+            net_force = mass * gravity_e - drag_force
+        
+            # Acceleration
+            acceleration = net_force / mass
+        
+            # Update velocity
+            velocities[i] = velocities[i-1] + acceleration * dt
+        
+            # Ensure velocity doesn't exceed terminal velocity
+            # This is a physical constraint due to air resistance
+            if velocities[i] > terminal_velocity_e:
+                velocities[i] = terminal_velocity_e
+        
+            # Update position
+            heights[i] = heights[i-1] - velocities[i-1] * dt
+        
+            # Check if shpere has hit the ground
+            if heights[i] <= 0:
+                # Truncate arrays at this point
+                time_points = time_points[:i+1]
+                velocities = velocities[:i+1]
+                heights = heights[:i+1]
+                print(f"Ball hits the ground after {time_points[-1]:.2f} seconds")
+                break
+    
+        # Create the velocity plot
+        fig = plt.figure(figsize=(10, 6))
+        plt.plot(time_points, velocities, 'b-', linewidth=2, label='Velocity')
+        plt.axhline(y=terminal_velocity, color='r', linestyle='--', 
+                   label=f'Terminal Velocity: {terminal_velocity:.2f} m/s')
+        plt.xlabel('Time (seconds)')
+        plt.ylabel('Velocity (m/s)')
+        plt.title('Velocity of Ball Dropped from 100 km')
+        plt.grid(True)
+        plt.legend()
+        plt.tight_layout()
+    
+        # Return the figure - Marimo handles this appropriately
+        return fig
     return
 
 
